@@ -63,6 +63,10 @@ temp_vars_dir="temp_vars";
 magento_version_temp_file_path="$temp_vars_dir/magento_version_temp_file";
 
 ## functions declarations
+function createVariablesTempFilesIfNotExist() {
+    createMagentoVersionTempFileIfNotExists
+}
+
 function createMagentoVersionTempFileIfNotExists() {
     if [ ! -f $magento_version_temp_file_path ]; then
         local PS3="Elige versión de magento:";
@@ -110,6 +114,6 @@ function askToSelectTask() {
 }
 
 ## code execution
-createMagentoVersionTempFileIfNotExists
+createVariablesTempFilesIfNotExist
 
 askToSelectTask

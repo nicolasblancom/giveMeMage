@@ -62,17 +62,34 @@ function readFirstLineOfFile() {
     echo $(head -n 1 $file)
 }
 
+function stringContainsSubString() {
+    local string=$1
+    local substring=$2
+
+    if [[ "$string" == *"$substring"* ]]; then
+        # found
+        return 0
+    else
+        # not found
+        return 1
+    fi
+}
+
 ###################################
 
 ## variables to source
 temp_vars_dir="temp_vars";
 magento_version_temp_file_path="$temp_vars_dir/magento_version_temp_file";
 project_name_temp_file_path="$temp_vars_dir/project_name_temp_file";
+php_version_temp_file_path="$temp_vars_dir/php_version_temp_file";
+vars_dir="vars";
+php_mage_mapping_file_path="$vars_dir/php_mage_mapping"
 
 ## functions declarations
 function createVariablesTempFilesIfNotExist() {
     createMagentoVersionTempFileIfNotExists
     createProjectNameTempFileIfNotExists
+    createPhpVersionTempFileIfNotExists
 }
 
 function createMagentoVersionTempFileIfNotExists() {
@@ -112,6 +129,36 @@ function createProjectNameTempFileIfNotExists() {
     else
         local existentProjectName=$(readFirstLineOfFile $project_name_temp_file_path)
         logWarn "Project name already introduced: [$existentProjectName]"
+    fi
+}
+
+function createPhpVersionTempFileIfNotExists() {
+    local phpVersion=$(getPhpVersionForMageVersion)
+
+    if [ ! -f $php_version_temp_file_path ]; then
+        touch $php_version_temp_file_path
+        echo $phpVersion > "$php_version_temp_file_path";
+    else
+        local existentPhpVersion=$(readFirstLineOfFile $php_version_temp_file_path)
+        logWarn "PHP version already set: [$existentPhpVersion]"
+    fi
+}
+
+function getPhpVersionForMageVersion() {
+    local magentoVersionMappingLine=$(readFirstLineOfFile $magento_version_temp_file_path)
+    local magentoVersionFound=0
+
+    while IFS= read -r line
+    do
+        if `stringContainsSubString "$line" "$magentoVersionMappingLine"` ; then
+            echo local retval=$line | awk -F'=' {'print $NF'}
+            magentoVersionFound=1
+        fi
+    done < "$php_mage_mapping_file_path"
+
+    if [ $magentoVersionFound -eq 0 ]; then
+        logError "Not magento version found in php-mageversion mapping file";
+        exit 1
     fi
 }
 

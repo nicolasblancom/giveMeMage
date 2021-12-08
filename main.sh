@@ -41,7 +41,7 @@ function getVarFromFile() {
     echo $(cat $filePath);
 }
 
-function listIncludesItem {
+function listIncludesItem() {
     local list="$1"
     local item="$2"
 
@@ -56,22 +56,30 @@ function listIncludesItem {
     # if `listIncludesItem "$tasks" "$task"` ; then
 }
 
+function readFirstLineOfFile() {
+    local file="$1"
+
+    echo $(head -n 1 $file)
+}
+
 ###################################
 
 ## variables to source
 temp_vars_dir="temp_vars";
 magento_version_temp_file_path="$temp_vars_dir/magento_version_temp_file";
+project_name_temp_file_path="$temp_vars_dir/project_name_temp_file";
 
 ## functions declarations
 function createVariablesTempFilesIfNotExist() {
     createMagentoVersionTempFileIfNotExists
+    createProjectNameTempFileIfNotExists
 }
 
 function createMagentoVersionTempFileIfNotExists() {
     if [ ! -f $magento_version_temp_file_path ]; then
         local PS3="Elige versión de magento:";
 
-        versiones="2.4.1 2.4.2";
+        local versiones="2.4.1 2.4.2";
 
         select version in $versiones
         do
@@ -89,6 +97,21 @@ function createMagentoVersionTempFileIfNotExists() {
             echo $version > "$magento_version_temp_file_path";
             return
         done
+    else
+        local existentVersion=$(readFirstLineOfFile $magento_version_temp_file_path)
+        logWarn "Magento version already selected: [$existentVersion]"
+    fi
+}
+
+function createProjectNameTempFileIfNotExists() {
+    if [ ! -f $project_name_temp_file_path ]; then
+        read -p "Introduce nombre del proyecto (sin espacios ni extension de dominio):" projectName
+
+        touch $project_name_temp_file_path
+        echo $projectName > "$project_name_temp_file_path";
+    else
+        local existentProjectName=$(readFirstLineOfFile $project_name_temp_file_path)
+        logWarn "Project name already introduced: [$existentProjectName]"
     fi
 }
 
@@ -97,7 +120,7 @@ function askToSelectTask() {
         local IFS='|'
         local PS3="Elige script a ejecutar:"
 
-        tasks="Preparar local para una v. de magento | Crear nuevo proyecto local "
+        local tasks=" Preparar local para una v. de magento | Crear nuevo proyecto local "
 
         select task in $tasks
         do

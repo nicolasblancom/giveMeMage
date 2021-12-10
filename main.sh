@@ -84,6 +84,7 @@ project_name_temp_file_path="$temp_vars_dir/project_name_temp_file";
 php_version_temp_file_path="$temp_vars_dir/php_version_temp_file";
 vars_dir="vars";
 php_mage_mapping_file_path="$vars_dir/php_mage_mapping"
+mage_vars_dir="$vars_dir/mage"
 
 ## functions declarations
 function createVariablesTempFilesIfNotExist() {
@@ -162,6 +163,17 @@ function getPhpVersionForMageVersion() {
     fi
 }
 
+function getDevilboxConfigValue() {
+    local devilboxInstallationDirLine=$1
+
+    while IFS= read -r line
+    do
+        if `stringContainsSubString "$line" "$devilboxInstallationDirLine"` ; then
+            echo local retval=$line | awk -F'=' {'print $NF'}
+        fi
+    done < "$vars_dir/devilbox"
+}
+
 function askToSelectTask() {
     if [ -f $magento_version_temp_file_path ]; then
         local IFS='|'
@@ -172,7 +184,7 @@ function askToSelectTask() {
         select task in $tasks
         do
             if [ $REPLY = 1 ]; then
-                log opc 1
+                prepareDevilboxForMageVersion
                 echo
             else
                 log otra
@@ -181,6 +193,14 @@ function askToSelectTask() {
             exit;
         done
     fi
+}
+
+function prepareDevilboxForMageVersion() {
+    local devilboxInstallationDirPath=$(getDevilboxConfigValue "devilboxInstallationDir")
+    local magentoVersion=$(readFirstLineOfFile $magento_version_temp_file_path)
+    local envForThisMageVersionFilePath="$mage_vars_dir/$magentoVersion/env_for_devilbox"
+
+    log $devilboxInstallationDirPath
 }
 
 ## code execution

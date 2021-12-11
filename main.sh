@@ -86,10 +86,21 @@ vars_dir="vars";
 mage_vars_dir="$vars_dir/mage"
 
 ## functions declarations
+## $1 sets to create project name temp variables too
 function createVariablesTempFilesIfNotExist() {
+    local createProject=$1
+    
+    if [ ! -d $temp_vars_dir ]; then
+        mkdir $temp_vars_dir
+    fi
+    
     createMagentoVersionTempFileIfNotExists
-    createProjectNameTempFileIfNotExists
     createPhpVersionTempFileIfNotExists
+    
+    # if is set or not empty
+    if [ ! -z $createProject ]; then
+        createProjectNameTempFileIfNotExists
+    fi
 }
 
 function createMagentoVersionTempFileIfNotExists() {

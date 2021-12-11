@@ -197,6 +197,11 @@ function askToSelectTask() {
 }
 
 function prepareDevilboxForMageVersion() {
+    appendDevilboxEnvFileForThisMageVersion
+    copyDockerComposeOverrideForThisMageVersion
+}
+
+function appendDevilboxEnvFileForThisMageVersion() {
     local currentDir=$PWD
     local devilboxInstallationDirPath=$(getDevilboxConfigValue "devilboxInstallationDir")
     local devilboxProjectsDirPath=$(getDevilboxConfigValue "devilboxProjectsDir")
@@ -219,6 +224,27 @@ function prepareDevilboxForMageVersion() {
     local sedDevilboxProjectsDirPath="HOST_PATH_HTTPD_DATADIR=$devilboxProjectsDirPath"
     local sedDevilboxEnvFilePath="$devilboxInstallationDirPath/.env"
     sed -i "$sedSearchPattern $sedDevilboxProjectsDirPath" "$sedDevilboxEnvFilePath"
+}
+
+function copyDockerComposeOverrideForThisMageVersion() {
+    if [ ! -f $magento_version_temp_file_path ]; then
+        logError "No magento version yet selected"
+        return 1
+    fi
+
+    local currentDir=$PWD
+    local devilboxInstallationDirPath=$(getDevilboxConfigValue "devilboxInstallationDir")
+    local magentoVersion=$(readFirstLineOfFile $magento_version_temp_file_path)
+    local dockerComposeOverrideFileName="docker-compose.override.yml"
+    local dockerComposeOverrideFilePath=$mage_vars_dir/$magentoVersion/$dockerComposeOverrideFileName
+
+    cd $devilboxInstallationDirPath
+    if [ -f $dockerComposeOverrideFileName ]; then
+        rm $dockerComposeOverrideFileName
+    fi
+    cd $currentDir
+
+    cp $dockerComposeOverrideFilePath "$devilboxInstallationDirPath/$dockerComposeOverrideFileName"
 }
 
 function createDevilboxProject() {

@@ -1,6 +1,7 @@
 In this `vars` directory, we have several files that the script uses to work. This files must be edited to work as we want.
 
 - mage/{magento-version}/env_for_devilbox: the variables that will be copied at the end of the devilbox `.env` file for that particular magento version
+- mage/{magento-version}/docker-compose.override.yml: file to copy to devilbox installation dir. It enables needed additional devilbox containers
 - devilbox: the variables that configuratse devilbox in our machine (`devilboxProjectsDir` will be copied to `.env` file)
 
 

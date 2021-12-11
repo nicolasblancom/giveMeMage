@@ -196,11 +196,28 @@ function askToSelectTask() {
 }
 
 function prepareDevilboxForMageVersion() {
+    local currentDir=$PWD
     local devilboxInstallationDirPath=$(getDevilboxConfigValue "devilboxInstallationDir")
+    local devilboxProjectsDirPath=$(getDevilboxConfigValue "devilboxProjectsDir")
     local magentoVersion=$(readFirstLineOfFile $magento_version_temp_file_path)
     local envForThisMageVersionFilePath="$mage_vars_dir/$magentoVersion/env_for_devilbox"
 
-    log $devilboxInstallationDirPath
+    # deleteDevilboxVarsFromEnvFile
+
+    # move to devilbox installation dir and create a .env file from scratch
+    cd "$devilboxInstallationDirPath"
+    rm ".env" > /dev/null 2>&1
+    cp "env-example" ".env" > /dev/null 2>&1
+    cd $currentDir
+
+    # insert devilbox config variables needed for this magento version
+    cat $envForThisMageVersionFilePath >> "$devilboxInstallationDirPath/.env"
+    
+    # Insert a line before match found
+    local sedSearchPattern='/^##END-GIVEMEMAGE.*/i'
+    local sedDevilboxProjectsDirPath="HOST_PATH_HTTPD_DATADIR=$devilboxProjectsDirPath"
+    local sedDevilboxEnvFilePath="$devilboxInstallationDirPath/.env"
+    sed -i "$sedSearchPattern $sedDevilboxProjectsDirPath" "$sedDevilboxEnvFilePath"
 }
 
 ## code execution

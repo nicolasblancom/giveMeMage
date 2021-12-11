@@ -224,6 +224,28 @@ function prepareDevilboxForMageVersion() {
 function createDevilboxProject() {
     createVariablesTempFilesIfNotExist "createProject"
 
+    # create project dir in devilbox project dir
+    local currentDir=$PWD
+    local devilboxInstallationDirPath=$(getDevilboxConfigValue "devilboxInstallationDir")
+    local projectName=$(readFirstLineOfFile $project_name_temp_file_path)
+    local devilboxProjectsDirPath=$(getDevilboxConfigValue "devilboxProjectsDir")
+    
+    cd $devilboxInstallationDirPath
+    if [ ! -d $devilboxProjectsDirPath ]; then
+        logError "No existe el directorio $devilboxProjectsDirPath"
+        exit 1
+    fi
+   
+    cd $devilboxProjectsDirPath
+    if [ -d $projectName ]; then
+        logWarn "Ya existe el directorio $projectName"
+        return 0
+    fi
+
+    mkdir -p "$projectName/htdocs"
+    log "Creado el directorio de proyecto: $projectName"
+
+    cd $currentDir
 }
 
 ## code execution

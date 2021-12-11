@@ -246,6 +246,36 @@ function createDevilboxProject() {
     log "Creado el directorio de proyecto: $projectName"
 
     cd $currentDir
+
+    addNewHostsEntry $projectName
+}
+
+function addNewHostsEntry() {
+    local projectName=$1
+
+    # if is set or not empty
+    if [ -z $projectName ]; then
+        logError "Not project name provided to addNewHostsEntry method"
+        exit 1
+    fi
+
+    local etcHostsFilePath=$(getDevilboxConfigValue "etcHosts")
+    local newHostsLine="127.0.0.1 $projectName.loc"
+    local found=0
+
+    # parse line by line /etc/hosts and search for a line with the project name
+    while IFS= read -r line
+    do
+        if `stringContainsSubString "$line" "$projectName"` ; then
+            found=1
+        fi
+    done < "$etcHostsFilePath"
+
+    if [ $found -eq 0 ]; then
+        logWarn "Do not forget to insert in $etcHostsFilePath: '$newHostsLine'";
+    else
+        logWarn "'$newHostsLine' already exists in $etcHostsFilePath";
+    fi
 }
 
 ## code execution

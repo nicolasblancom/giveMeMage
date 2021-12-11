@@ -1,2 +1,3 @@
 devilboxInstallationDir=/home/nicolasblancom/devilbox
 devilboxProjectsDir=../www-projects
+etcHosts=/etc/hosts

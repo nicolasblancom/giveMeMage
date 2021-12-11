@@ -110,17 +110,7 @@ function createMagentoVersionTempFileIfNotExists() {
         local versiones="2.4.1 2.4.2";
 
         select version in $versiones
-        do
-            if [ $version = "2.4.1" ]; then
-                log "2.4.1";
-                echo 
-            elif [ $version = "2.4.2" ]; then
-                log "2.4.2";
-                echo
-            else
-                exit;
-            fi
-            
+        do          
             touch $magento_version_temp_file_path;
             echo $version > "$magento_version_temp_file_path";
             return
@@ -188,20 +178,20 @@ function getDevilboxConfigValue() {
 function askToSelectTask() {
     if [ -f $magento_version_temp_file_path ]; then
         local IFS='|'
-        local PS3="Elige script a ejecutar:"
+        local PS3="Elige script a ejecutar (cualquier otra opción para terminar):"
 
-        local tasks=" Preparar local para una v. de magento | Crear nuevo proyecto local "
+        local tasks=" Preparar local para la v. de magento elegida | Crear nuevo proyecto local "
 
         select task in $tasks
         do
             if [ $REPLY = 1 ]; then
                 prepareDevilboxForMageVersion
-                echo
+            elif [ $REPLY = 2 ]; then
+                createDevilboxProject
             else
-                log otra
-                echo
+                logWarn 'Fin'
+                exit
             fi
-            exit;
         done
     fi
 }
@@ -229,6 +219,11 @@ function prepareDevilboxForMageVersion() {
     local sedDevilboxProjectsDirPath="HOST_PATH_HTTPD_DATADIR=$devilboxProjectsDirPath"
     local sedDevilboxEnvFilePath="$devilboxInstallationDirPath/.env"
     sed -i "$sedSearchPattern $sedDevilboxProjectsDirPath" "$sedDevilboxEnvFilePath"
+}
+
+function createDevilboxProject() {
+    createVariablesTempFilesIfNotExist "createProject"
+
 }
 
 ## code execution

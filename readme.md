@@ -1,3 +1,11 @@
+In this `vars` directory, we have several files that the script uses to work. This files must be edited to work as we want.
+
+- mage/{magento-version}/env_for_devilbox: the variables that will be copied at the end of the devilbox `.env` file for that particular magento version
+- devilbox: the variables that configuratse devilbox in our machine (`devilboxProjectsDir` will be copied to `.env` file)
+
+
+---
+
 - selector de tareas/scripts
 - switch entorno local devilbox para una v de magento 2 concreta: 
     --> .env_give_me_magento con variables a usar y mapeo versiones (p ej docker-compose.overide y v magento), todo partiendo desde una v de magento como un array

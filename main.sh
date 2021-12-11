@@ -83,7 +83,6 @@ magento_version_temp_file_path="$temp_vars_dir/magento_version_temp_file";
 project_name_temp_file_path="$temp_vars_dir/project_name_temp_file";
 php_version_temp_file_path="$temp_vars_dir/php_version_temp_file";
 vars_dir="vars";
-php_mage_mapping_file_path="$vars_dir/php_mage_mapping"
 mage_vars_dir="$vars_dir/mage"
 
 ## functions declarations
@@ -146,19 +145,20 @@ function createPhpVersionTempFileIfNotExists() {
 }
 
 function getPhpVersionForMageVersion() {
-    local magentoVersionMappingLine=$(readFirstLineOfFile $magento_version_temp_file_path)
-    local magentoVersionFound=0
+    local magentoVersion=$(readFirstLineOfFile $magento_version_temp_file_path)
+    local envForThisMageVersionFilePath="$mage_vars_dir/$magentoVersion/env_for_devilbox"
+    local found=0
 
     while IFS= read -r line
     do
-        if `stringContainsSubString "$line" "$magentoVersionMappingLine"` ; then
+        if `stringContainsSubString "$line" "PHP_SERVER="` ; then
             echo local retval=$line | awk -F'=' {'print $NF'}
-            magentoVersionFound=1
+            found=1
         fi
-    done < "$php_mage_mapping_file_path"
+    done < "$envForThisMageVersionFilePath"
 
-    if [ $magentoVersionFound -eq 0 ]; then
-        logError "Not magento version found in php-mageversion mapping file";
+    if [ $found -eq 0 ]; then
+        logError "Not PHP version found in $envForThisMageVersionFilePath file";
         exit 1
     fi
 }

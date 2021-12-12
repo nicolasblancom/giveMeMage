@@ -178,9 +178,9 @@ function getDevilboxConfigValue() {
 function askToSelectTask() {
     if [ -f $magento_version_temp_file_path ]; then
         local IFS='|'
-        local PS3="Elige script a ejecutar (cualquier otra opción para terminar):"
+        local PS3="Elige script a ejecutar (cualquier otra opción para terminar): "
 
-        local tasks=" Preparar local para la v. de magento elegida | Crear nuevo proyecto local "
+        local tasks=" Preparar local para la v. de magento elegida | Crear nuevo proyecto local | Crear script instalación magento en un proyecto "
 
         select task in $tasks
         do
@@ -188,6 +188,8 @@ function askToSelectTask() {
                 prepareDevilboxForMageVersion
             elif [ $REPLY = 2 ]; then
                 createDevilboxProject
+            elif [ $REPLY = 3 ]; then
+                createMagentoInstallationScriptAndMoveToProject
             else
                 logWarn 'Fin'
                 exit
@@ -339,6 +341,55 @@ function addNewHostsEntry() {
     else
         logWarn "'$newHostsLine' already exists in $etcHostsFilePath";
     fi
+}
+
+function createMagentoInstallationScriptAndMoveToProject() {
+    local currentDir=$PWD
+    local devilboxInstallationDirPath=$(getDevilboxConfigValue "devilboxInstallationDir")
+    local devilboxProjectsDirPath=$(getDevilboxConfigValue "devilboxProjectsDir")
+    local magentoVersion=$(readFirstLineOfFile $magento_version_temp_file_path)
+    local installMagentoScritpFileName="install_magento.sh"
+    local installMagentoScritpFilePath="$mage_vars_dir/$magentoVersion/$installMagentoScritpFileName"
+    local authJsonFileName="auth.json"
+    local authJsonFilePath="$mage_vars_dir/$magentoVersion/$authJsonFileName"
+    local installationScriptNewDirName="givememageInstallMagento"
+    
+    cd $devilboxInstallationDirPath; cd $devilboxProjectsDirPath
+    
+    # select giving as options the list of project dirs
+    local IFS=$'\n'
+    local PS3="Elige directorio de proyecto donde copiar el script de instalación (creará un directorio nuevo givememageInstallMagento): "
+    local devilboxProjectsList=$(ls -d */)
+
+    select projectDir in $devilboxProjectsList
+    do
+        cd $projectDir
+        local projectNameFromDirName=$(echo "$projectDir" | sed 's,/,,g') # remove slash from dir name
+        
+        if [ ! -d $installationScriptNewDirName ]; then 
+            mkdir $installationScriptNewDirName
+        
+            cp "$currentDir/$installMagentoScritpFilePath" $installationScriptNewDirName
+            cp "$currentDir/$authJsonFilePath" $installationScriptNewDirName
+
+            cd $installationScriptNewDirName
+            
+            # replace in script database creation with project_name
+            sed -i "s/##project_name##/$projectNameFromDirName/" $installMagentoScritpFileName
+
+            # replace in script download magento url with magento_version
+            sed -i "s/##magento_version##/$magentoVersion/" $installMagentoScritpFileName
+
+            logInfo 'Copied an auth.json file. Please edit it and insert your own credentials (those are functional although).'
+        else
+            logError "There is already a givememageInstallMagento dir!! Delete it first if you want to create installation script"
+        fi
+
+        cd $currentDir
+        break
+    done
+
+    cd $currentDir
 }
 
 ## code execution

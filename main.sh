@@ -200,7 +200,7 @@ function prepareDevilboxForMageVersion() {
     appendDevilboxEnvFileForThisMageVersion
     copyDockerComposeOverrideForThisMageVersion
     copyCustomIniForThisMageVersion
-    # copyDevilboxStartScriptForThisMageVersion
+    copyDevilboxStartScriptForThisMageVersion
     # copyMagentoInstallScriptForThisMageVersion
 }
 
@@ -266,6 +266,22 @@ function copyCustomIniForThisMageVersion() {
     cd $currentDir
 
     cp $customIniFilePath "$devilboxInstallationDirPath/cfg/php-ini-$phpVersion"
+}
+
+function copyDevilboxStartScriptForThisMageVersion() {
+    local currentDir=$PWD
+    local devilboxInstallationDirPath=$(getDevilboxConfigValue "devilboxInstallationDir")
+    local magentoVersion=$(readFirstLineOfFile $magento_version_temp_file_path)
+    local devilBoxStartScriptName="_start.sh"
+    local devilBoxStartScriptFilePath=$mage_vars_dir/$magentoVersion/$devilBoxStartScriptName
+
+    cd $devilboxInstallationDirPath
+    if [ -f $devilBoxStartScriptName ]; then
+        rm $devilBoxStartScriptName
+    fi
+    cd $currentDir
+
+    cp $devilBoxStartScriptFilePath $devilboxInstallationDirPath
 }
 
 function createDevilboxProject() {

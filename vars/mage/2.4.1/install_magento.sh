@@ -45,7 +45,7 @@ copy_auth_json
 
 # download magento with magento_version
 function download_magento {
-    /usr/local/bin/composer-1 create-project --repository-url=https://repo.magento.com/ magento/project-community-edition=##magento_version## ./htdocs
+    /usr/local/bin/composer-1 create-project --repository-url=https://repo.magento.com/ magento/project-community-edition=##magento_version## ../htdocs
 }
 download_magento
 
@@ -53,7 +53,7 @@ download_magento
 function set_permissions {
     ## TODO check if not in this directory first
     
-    cd htdocs
+    cd ../htdocs
     find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
     find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +
     # chown -R :devilbox .
@@ -71,6 +71,7 @@ function install_magento {
     # cd htdocs
 
     php -d memory_limit=-1 bin/magento setup:install \
+    --backend-frontname=admin_123 \
     --base-url=http://##project_name##.loc/ \
     --db-host=127.0.0.1 \
     --db-name=##project_name## \
@@ -96,8 +97,8 @@ function post_install_steps {
     ## cd htdocs
 
     # install Pestle
-    curl -LO http://pestle.pulsestorm.net/pestle.phar
-    chmod +x pestle.phar
+    # curl -LO http://pestle.pulsestorm.net/pestle.phar
+    # chmod +x pestle.phar
 
     # disable magento modules
     php bin/magento module:disable Magento_TwoFactorAuth

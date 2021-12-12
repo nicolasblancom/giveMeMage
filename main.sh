@@ -34,7 +34,7 @@ function getVarFromFile() {
     local filePath=$1
 
     if [ ! -f $filePath ]; then
-        logError "No existe el fichero $filePath en getVarFromFile"
+        logError "File $filePath does not exist in getVarFromFile method"
         exit 1
     fi
 
@@ -105,7 +105,7 @@ function createVariablesTempFilesIfNotExist() {
 
 function createMagentoVersionTempFileIfNotExists() {
     if [ ! -f $magento_version_temp_file_path ]; then
-        local PS3="Elige versión de magento:";
+        local PS3="Choose a Magento version: ";
 
         local versiones="2.4.1 2.4.2";
 
@@ -123,7 +123,7 @@ function createMagentoVersionTempFileIfNotExists() {
 
 function createProjectNameTempFileIfNotExists() {
     if [ ! -f $project_name_temp_file_path ]; then
-        read -p "Introduce nombre del proyecto (sin espacios ni extension de dominio):" projectName
+        read -p "Enter project name (no spaces or domain extension): " projectName
 
         touch $project_name_temp_file_path
         echo $projectName > "$project_name_temp_file_path";
@@ -178,9 +178,9 @@ function getDevilboxConfigValue() {
 function askToSelectTask() {
     if [ -f $magento_version_temp_file_path ]; then
         local IFS='|'
-        local PS3="Elige script a ejecutar (cualquier otra opción para terminar): "
+        local PS3="Choose a task (any other option, finish the script): "
 
-        local tasks=" Preparar local para la v. de magento elegida | Crear nuevo proyecto local | Crear script instalación magento en un proyecto "
+        local tasks=" Prepare local devilbox for the chosen Magento version | Create new local project dir | Create Magento installation script in a project dir "
 
         select task in $tasks
         do
@@ -191,7 +191,7 @@ function askToSelectTask() {
             elif [ $REPLY = 3 ]; then
                 createMagentoInstallationScriptAndMoveToProject
             else
-                logWarn 'Fin'
+                logInfo 'END'
                 exit
             fi
         done
@@ -297,18 +297,18 @@ function createDevilboxProject() {
     
     cd $devilboxInstallationDirPath
     if [ ! -d $devilboxProjectsDirPath ]; then
-        logError "No existe el directorio $devilboxProjectsDirPath"
+        logError "Directory does not exist: $devilboxProjectsDirPath"
         exit 1
     fi
    
     cd $devilboxProjectsDirPath
     if [ -d $projectName ]; then
-        logWarn "Ya existe el directorio $projectName"
+        logWarn "Directory already exists: $projectName"
         return 0
     fi
 
     mkdir -p "$projectName/htdocs"
-    log "Creado el directorio de proyecto: $projectName"
+    log "Project dir created: $projectName"
 
     cd $currentDir
 
@@ -353,12 +353,13 @@ function createMagentoInstallationScriptAndMoveToProject() {
     local authJsonFileName="auth.json"
     local authJsonFilePath="$mage_vars_dir/$magentoVersion/$authJsonFileName"
     local installationScriptNewDirName="givememageInstallMagento"
+    local installationDetailsFeedbackFileName="admin_credentials.txt"
     
     cd $devilboxInstallationDirPath; cd $devilboxProjectsDirPath
     
     # select giving as options the list of project dirs
     local IFS=$'\n'
-    local PS3="Elige directorio de proyecto donde copiar el script de instalación (creará un directorio nuevo givememageInstallMagento): "
+    local PS3="Choose a project directory to create the installation script (a new givememageInstallMagento directory will be created): "
     local devilboxProjectsList=$(ls -d */)
 
     select projectDir in $devilboxProjectsList
@@ -381,6 +382,17 @@ function createMagentoInstallationScriptAndMoveToProject() {
             sed -i "s/##magento_version##/$magentoVersion/" $installMagentoScritpFileName
 
             logInfo 'Copied an auth.json file. Please edit it and insert your own credentials (those are functional although).'
+            logInfo 'Execute in a shel this command: '
+            log "cd $devilboxInstallationDirPath && ./_start.sh && ./shell.sh"
+            logInfo 'Once your are inside devilbox container, run magento installation: '
+            log "cd $projectNameFromDirName/$installationScriptNewDirName && ./$installMagentoScritpFileName"
+            
+            touch $installationDetailsFeedbackFileName
+            echo "Front url: http://$projectNameFromDirName.loc \n" >> $installationDetailsFeedbackFileName
+            echo "Admin url: http://$projectNameFromDirName.loc/admin123 \n" >> $installationDetailsFeedbackFileName
+            echo "Admin user: admin \n" >> $installationDetailsFeedbackFileName
+            echo "Admin password: g9egcwUE6WEGsyw98kKB4hu \n" >> $installationDetailsFeedbackFileName
+            logInfo "Admin credentials and url are stored in a file: $installMagentoScritpFileName/$installationDetailsFeedbackFileName"
         else
             logError "There is already a givememageInstallMagento dir!! Delete it first if you want to create installation script"
         fi

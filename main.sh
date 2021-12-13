@@ -180,7 +180,9 @@ function askToSelectTask() {
         local IFS='|'
         local PS3="Choose a task (any other option, finish the script): "
 
-        local tasks=" Prepare local devilbox for the chosen Magento version | Create new local project dir | Create Magento installation script in a project dir "
+        local tasks=" Prepare local devilbox for the chosen Magento version | Create new local project dir | Create Magento installation script in a project dir | Start again (delete temporary files)"
+
+        ## TODO: add a removeTempFiles method
 
         select task in $tasks
         do
@@ -190,6 +192,8 @@ function askToSelectTask() {
                 createDevilboxProject
             elif [ $REPLY = 3 ]; then
                 createMagentoInstallationScriptAndMoveToProject
+            elif [ $REPLY = 4 ]; then
+                deleteTemporaryFiles
             else
                 logInfo 'END'
                 exit
@@ -388,10 +392,10 @@ function createMagentoInstallationScriptAndMoveToProject() {
             log "cd $projectNameFromDirName/$installationScriptNewDirName && ./$installMagentoScritpFileName"
             
             touch $installationDetailsFeedbackFileName
-            echo "Front url: http://$projectNameFromDirName.loc \n" >> $installationDetailsFeedbackFileName
-            echo "Admin url: http://$projectNameFromDirName.loc/admin123 \n" >> $installationDetailsFeedbackFileName
-            echo "Admin user: admin \n" >> $installationDetailsFeedbackFileName
-            echo "Admin password: g9egcwUE6WEGsyw98kKB4hu \n" >> $installationDetailsFeedbackFileName
+            echo "Front url: http://$projectNameFromDirName.loc" >> $installationDetailsFeedbackFileName
+            echo "Admin url: http://$projectNameFromDirName.loc/admin_123" >> $installationDetailsFeedbackFileName
+            echo "Admin user: admin" >> $installationDetailsFeedbackFileName
+            echo "Admin password: g9egcwUE6WEGsyw98kKB4hu" >> $installationDetailsFeedbackFileName
             logInfo "Admin credentials and url are stored in a file: $installMagentoScritpFileName/$installationDetailsFeedbackFileName"
         else
             logError "There is already a givememageInstallMagento dir!! Delete it first if you want to create installation script"
@@ -402,6 +406,11 @@ function createMagentoInstallationScriptAndMoveToProject() {
     done
 
     cd $currentDir
+}
+
+function deleteTemporaryFiles() {
+    rm -r $temp_vars_dir
+    exit
 }
 
 ## code execution

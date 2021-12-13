@@ -10,6 +10,16 @@ Devilbox installed. See [installation steps in the docs](https://devilbox.readth
 
 ## Usage
 
+First of all, set in `giveMeMage/devilbox` the three needed variables **using full paths**. For example:
+
+```
+devilboxInstallationDir=/home/someone/devilbox
+devilboxProjectsDir=../www-projects
+etcHosts=/etc/hosts
+```
+
+NOTE: `devilboxProjectsDir` is the variable set in your Devilbox `.env` file as `HOST_PATH_HTTPD_DATADIR`
+
 Change directory to the giveMeMage installation directoy 
 
 ```cd giveMeMage``` 
@@ -21,6 +31,8 @@ and execute
 (if not execution pemissions given yet to this file, do first `sudo chmod +x main.sh`)
 
 You will be asked to choose a magento version. After that you will be asked for what task you want to do.
+
+**When you need to start over again** choose the task to start again (delete temporary files).
 
 ### Possible tasks
 

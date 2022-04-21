@@ -70,4 +70,15 @@ In this `vars` directory, we have several files that the script uses to work. Th
 
 ## How do I add a new version of Magento to be installed with this script
 
-TODO
+- Add new version in `createMagentoVersionTempFileIfNotExists` function
+- Copy `vars/mage/{someVersion}` into exactly the version added in `createMagentoVersionTempFileIfNotExists`.
+- Modify new copied `vars/mage/{someVersion}` files
+    - _start.sh (probably no change needed)
+    - auth.json (probably no change needed)
+    - custom.ini (probably no change needed)
+    - docker-compose.override.yml
+    - env_for_devilbox
+    - install_magento.sh --> probably need change only in: 
+        - `install_magento` for admin credentials, elastic credentiales, database credentials)
+        - `post_install_steps` for further steps like installing some composer dependency or disabling some module
+        - `finish_installation` for final operations like nomal magento commands

@@ -107,7 +107,7 @@ function createMagentoVersionTempFileIfNotExists() {
     if [ ! -f $magento_version_temp_file_path ]; then
         local PS3="Choose a Magento version: ";
 
-        local versiones="2.4.1 2.4.2";
+        local versiones="2.4.1 2.4.3-p2";
 
         select version in $versiones
         do          
@@ -396,7 +396,7 @@ function createMagentoInstallationScriptAndMoveToProject() {
             echo "Admin url: http://$projectNameFromDirName.loc/admin_123" >> $installationDetailsFeedbackFileName
             echo "Admin user: admin" >> $installationDetailsFeedbackFileName
             echo "Admin password: g9egcwUE6WEGsyw98kKB4hu" >> $installationDetailsFeedbackFileName
-            logInfo "Admin credentials and url are stored in a file: $installMagentoScritpFileName/$installationDetailsFeedbackFileName"
+            logInfo "Admin credentials and url are stored in a file: $installationScriptNewDirName/$installationDetailsFeedbackFileName"
         else
             logError "There is already a givememageInstallMagento dir!! Delete it first if you want to create installation script"
         fi

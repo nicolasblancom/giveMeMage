@@ -107,7 +107,7 @@ function createMagentoVersionTempFileIfNotExists() {
     if [ ! -f $magento_version_temp_file_path ]; then
         local PS3="Choose a Magento version: ";
 
-        local versiones="2.4.1 2.4.3-p2";
+        local versiones="2.3.7-p3 2.4.1 2.4.3-p2";
 
         select version in $versiones
         do          
@@ -221,7 +221,7 @@ function appendDevilboxEnvFileForThisMageVersion() {
 
     # move to devilbox installation dir and create a .env file from scratch
     cd "$devilboxInstallationDirPath"
-    rm ".env" > /dev/null 2>&1
+    rm -f ".env" > /dev/null 2>&1
     cp "env-example" ".env" > /dev/null 2>&1
     cd $currentDir
 
@@ -249,7 +249,7 @@ function copyDockerComposeOverrideForThisMageVersion() {
 
     cd $devilboxInstallationDirPath
     if [ -f $dockerComposeOverrideFileName ]; then
-        rm $dockerComposeOverrideFileName
+        rm -f $dockerComposeOverrideFileName > /dev/null 2>&1
     fi
     cd $currentDir
 
@@ -267,7 +267,7 @@ function copyCustomIniForThisMageVersion() {
     cd $devilboxInstallationDirPath
     cd "cfg/php-ini-$phpVersion"
     if [ -f $customIniFileName ]; then
-        rm $customIniFileName
+        rm -f $customIniFileName > /dev/null 2>&1
     fi
     cd $currentDir
 

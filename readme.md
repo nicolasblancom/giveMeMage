@@ -70,7 +70,7 @@ In this `vars` directory, we have several files that the script uses to work. Th
 
 ## How do I add a new version of Magento to be installed with this script
 
-- Add new version in `createMagentoVersionTempFileIfNotExists` function
+- Add new version in `createMagentoVersionTempFileIfNotExists` function in `main.sh`
 - Copy `vars/mage/{someVersion}` into exactly the version added in `createMagentoVersionTempFileIfNotExists`.
 - Modify new copied `vars/mage/{someVersion}` files
     - _start.sh (probably no change needed)

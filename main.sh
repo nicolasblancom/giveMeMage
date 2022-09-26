@@ -107,7 +107,7 @@ function createMagentoVersionTempFileIfNotExists() {
     if [ ! -f $magento_version_temp_file_path ]; then
         local PS3="Choose a Magento version: ";
 
-        local versiones="2.3.7-p3 2.4.1 2.4.3-p2";
+        local versiones="2.3.7-p3 2.4.1 2.4.3-p2 2.4.4";
 
         select version in $versiones
         do          

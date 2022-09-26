@@ -107,6 +107,7 @@ function post_install_steps {
     /usr/local/bin/composer-1 require --no-update mageplaza/magento-2-spanish-language-pack:dev-master
 
     # TODO: Install mageplaza smtp. Assign temporary key directly from db
+    /usr/local/bin/composer-1 require --no-update mageplaza/smtp
 
     # enable grunt for local developemnt
     cp Gruntfile.js.sample Gruntfile.js
